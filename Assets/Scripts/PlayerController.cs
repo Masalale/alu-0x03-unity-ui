@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public float speed = 800f;
     public int health = 5;
     public Text scoreText;
+    public Text healthText;
+    public Text winLoseText;
+    public Image winLoseBG;
     private int score = 0;
     private Rigidbody rb;
 
@@ -19,6 +23,7 @@ public class PlayerController : MonoBehaviour
             rb.linearDamping = 1.2f;
         }
         SetScoreText();
+        SetHealthText();
     }
 
     void FixedUpdate()
@@ -33,14 +38,34 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("menu");
+        }
         if (health == 0)
         {
-            Debug.Log("Game Over!");
+            if (winLoseBG != null)
+            {
+                winLoseBG.gameObject.SetActive(true);
+                winLoseBG.color = Color.red;
+            }
+            if (winLoseText != null)
+            {
+                winLoseText.text = "Game Over!";
+                winLoseText.color = Color.white;
+            }
             health = 5;
             score = 0;
             SetScoreText();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            SetHealthText();
+            StartCoroutine(LoadScene(3));
         }
+    }
+
+    IEnumerator LoadScene(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void SetScoreText()
@@ -48,6 +73,14 @@ public class PlayerController : MonoBehaviour
         if (scoreText != null)
         {
             scoreText.text = "Score: " + score;
+        }
+    }
+
+    void SetHealthText()
+    {
+        if (healthText != null)
+        {
+            healthText.text = "Health: " + health;
         }
     }
 
@@ -62,11 +95,21 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("Trap"))
         {
             health--;
-            Debug.Log("Health: " + health);
+            SetHealthText();
         }
         else if (other.CompareTag("Goal"))
         {
-            Debug.Log("You win!");
+            if (winLoseBG != null)
+            {
+                winLoseBG.gameObject.SetActive(true);
+                winLoseBG.color = Color.green;
+            }
+            if (winLoseText != null)
+            {
+                winLoseText.text = "You Win!";
+                winLoseText.color = Color.black;
+            }
+            StartCoroutine(LoadScene(3));
         }
     }
 }
