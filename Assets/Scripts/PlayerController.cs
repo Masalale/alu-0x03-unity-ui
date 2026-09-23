@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 800f;
     public int health = 5;
+    public Text scoreText;
     private int score = 0;
     private Rigidbody rb;
 
@@ -16,6 +18,7 @@ public class PlayerController : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezePositionY;
             rb.linearDamping = 1.2f;
         }
+        SetScoreText();
     }
 
     void FixedUpdate()
@@ -35,7 +38,16 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Game Over!");
             health = 5;
             score = 0;
+            SetScoreText();
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+    }
+
+    void SetScoreText()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score;
         }
     }
 
@@ -44,7 +56,7 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Pickup"))
         {
             score++;
-            Debug.Log("Score: " + score);
+            SetScoreText();
             other.gameObject.SetActive(false);
         }
         else if (other.CompareTag("Trap"))
